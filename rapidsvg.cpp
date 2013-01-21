@@ -28,6 +28,9 @@
 void read_file_data(const std::string& file_name, std::vector<char>* data)
 {
 	std::fstream fin(file_name, std::ios::binary | std::ios::in );
+	if (!fin) {
+		throw std::runtime_error("Could not open file.");
+	}
 	fin.seekg(0, std::ios::end);
 	size_t file_size = fin.tellg();
 	fin.seekg(0, std::ios::beg);
@@ -326,6 +329,10 @@ void main_function(int argc, char** argv)
 
 int main(int argc, char** argv)
 {
+	if (argc == 1) {
+		std::cerr << "Usage: " << argv[0] << " <filename>\n";
+		return 0;
+	}
 	try {
 		main_function(argc, argv);
 	}
