@@ -196,6 +196,8 @@ void display(void)
 		std::cerr << "Rendered in " << end_time - start_time << " seconds.\n";
 		first_time = false;
 	}
+	
+	glFlush();
 }
 void split(const std::string &s, char delim, std::vector<std::string>* elems) {
 	elems->clear();

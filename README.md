@@ -9,3 +9,10 @@ cd build
 cmake ..
 make
 ```
+In Ubuntu, I had to install the following packages:
+Use CMake.
+```
+sudo apt-get install freeglut3 freeglut3-dev
+sudo apt-get install binutils-gold
+sudo apt-get install libxmu-dev libxi-dev
+```

@@ -1,6 +1,6 @@
 # Author: petter.strandmark@gmail.com (Petter Strandmark)
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.0)
-PROJECT(RAPIDSVG CXX)
+PROJECT(RAPIDSVG C CXX)
 
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/bin)
@@ -43,6 +43,26 @@ IF (${OPENMP_FOUND})
     LIST(APPEND SPII_LIBRARY_DEPENDENCIES gomp)
   ENDIF (NOT MSVC)
 ENDIF (${OPENMP_FOUND})
+
+# OpenGL and GLUT
+IF (NOT MSVC)
+  find_package(GLUT REQUIRED)
+  if (GLUT_FOUND)
+    MESSAGE("-- Found Glut.")
+    include_directories(${GLUT_INCLUDE_DIR})
+    link_directories(${GLUT_LIBRARY_DIRS})
+    add_definitions(${GLUT_DEFINITIONS})
+  endif (GLUT_FOUND)
+
+  find_package(OpenGL REQUIRED)
+  if (OPENGL_FOUND)
+    MESSAGE("-- Found OpenGL.")
+    include_directories(${OPENGL_INCLUDE_DIR})
+    link_directories(${OpenGL_LIBRARY_DIRS})
+    add_definitions(${OpenGL_DEFINITIONS})
+  endif (OPENGL_FOUND)
+ENDIF (NOT MSVC)
+
 
 
 # Change the default build type from Debug to Release, while still
@@ -120,5 +140,9 @@ ENDIF (CMAKE_BUILD_TYPE STREQUAL "Release")
 ADD_EXECUTABLE(rapidsvg
   rapidsvg.cpp
   line.cpp)
+
+IF (NOT MSVC)
+  target_link_libraries(rapidsvg ${OPENGL_LIBRARIES} ${GLUT_LIBRARY})
+ENDIF (NOT MSVC)
 
 ADD_SUBDIRECTORY(svg)
