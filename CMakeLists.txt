@@ -139,7 +139,8 @@ ENDIF (CMAKE_BUILD_TYPE STREQUAL "Release")
 
 ADD_EXECUTABLE(rapidsvg
   rapidsvg.cpp
-  line.cpp)
+  line.cpp
+  svg_file.cpp)
 
 IF (NOT MSVC)
   target_link_libraries(rapidsvg ${OPENGL_LIBRARIES} ${GLUT_LIBRARY})

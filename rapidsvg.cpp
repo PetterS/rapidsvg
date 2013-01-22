@@ -3,10 +3,8 @@
 #include <cmath>
 #include <cstdlib>
 #include <cstring>
-#include <fstream>
 #include <iomanip>
 #include <iostream>
-#include <queue>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -20,34 +18,18 @@
 #include <GL/glut.h> // glut.h includes gl.h.
 #endif
 
-#include <rapidxml.hpp>
-
 #include "line.h"
+#include "svg_file.h"
 
-// Reads a binary file into a vector of char.
-void read_file_data(const std::string& file_name, std::vector<char>* data)
-{
-	std::fstream fin(file_name, std::ios::binary | std::ios::in );
-	if (!fin) {
-		throw std::runtime_error("Could not open file.");
-	}
-	fin.seekg(0, std::ios::end);
-	size_t file_size = fin.tellg();
-	fin.seekg(0, std::ios::beg);
-	data->resize(file_size + 1);
-	if (!fin.read(&data->at(0), file_size)) {
-		throw std::runtime_error("Failed to read file.");
-	}
-}
+
+// SVG file currently opened.
+SVGFile svg_file;
 
 // Part of the SVG currently being viewed.
 float view_left   = 0.0f;
 float view_right  = 1.0f;
 float view_bottom = 0.0f;
 float view_top    = 1.0f;
-
-// Lines which should be drawn.
-std::vector<Line> lines;
 
 void center_display(int view_x, int view_y, float radius_x, float radius_y)
 {
@@ -146,7 +128,12 @@ void mouse(int button, int action, int x, int y)
 
 void keyboard (unsigned char key, int x, int y)
 {
-	std::cerr << "key=" << int(key) << " x=" << x << " y=" << y << '\n';
+	//std::cerr << "key=" << int(key) << " x=" << x << " y=" << y << '\n';
+	
+	if (key == 'r') {
+		svg_file.reload();
+		glutPostRedisplay();
+	}
 }
 
 // Draws a line between (x1,y1) - (x2,y2) with a start thickness of t1 and
@@ -187,7 +174,7 @@ void display(void)
 	glHint( GL_LINE_SMOOTH_HINT, GL_NICEST );
 	glHint( GL_POLYGON_SMOOTH_HINT, GL_NICEST );
 
-	for (auto& line : lines) {
+	for (auto& line : svg_file.lines) {
 		glColor3d(line.r, line.g, line.b);
 		draw_line(line.x1, line.y1, line.x2, line.y2, line.width, line.width);
 	}
@@ -201,6 +188,7 @@ void display(void)
 	}
 	
 	glFlush();
+	glutSwapBuffers();
 }
 void split(const std::string &s, char delim, std::vector<std::string>* elems) {
 	elems->clear();
@@ -214,107 +202,23 @@ void split(const std::string &s, char delim, std::vector<std::string>* elems) {
 void main_function(int argc, char** argv)
 {
 	using namespace std;
-	using namespace rapidxml;
-	double start_time, end_time;
 
-	start_time = ::omp_get_wtime();
-	std::vector<char> data;
 	if (argc <= 1) {
-		read_file_data("example.svg", &data);
+		svg_file.load("example.svg");
 	}
 	else {
-		read_file_data(argv[1], &data);
+		svg_file.load(argv[1]);
 	}
-	end_time = ::omp_get_wtime();
-	std::cerr << "Read file in " << end_time - start_time << " seconds.\n";
-
-	start_time = ::omp_get_wtime();
-	xml_document<> doc;
-	data.push_back(0);
-	doc.parse<0>(&data[0]);
-	end_time = ::omp_get_wtime();
-	std::cerr << "Parsed XML in " << end_time - start_time << " seconds.\n";
-
-	start_time = ::omp_get_wtime();
-
-	xml_node<>* svg = doc.first_node("svg");
-	if (!svg) {
-		throw std::runtime_error("No <svg> node.");
-	}
-
-	float svg_width = 1;
-	float svg_height = 1;
-
-	for (auto attr = svg->first_attribute(); attr;
-	          attr = attr->next_attribute())
-	{
-		if (strcmp(attr->name(), "width") == 0) {
-			svg_width = float(atof(attr->value()));
-		}
-		else if (strcmp(attr->name(), "height") == 0) {
-			svg_height = float(atof(attr->value()));
-		}
-	}
-
-	// Queue of nodes we need to explore.
-	queue<xml_node<>*> nodes;
-	nodes.push(svg);
-
-	// Process the queue.
-	while ( !nodes.empty()) {
-		auto node = nodes.front();
-		nodes.pop();
-
-		// For each child of this node.
-		for (auto child = node->first_node(); child;
-		          child = child->next_sibling()) {
-			if (strcmp(child->name(), "g") == 0) {
-				// Found a group; add it to queue.
-				nodes.push(child);
-			}
-			else if (strcmp(child->name(), "line") == 0) {
-				// Add line to the collection of lines.
-				lines.push_back(Line());
-				Line& line = lines.back();
-
-				// To through the line attributes.
-				for (xml_attribute<> *attr = child->first_attribute();
-						attr; attr = attr->next_attribute())
-				{
-					if (strcmp(attr->name(), "x1") == 0) {
-						line.x1 = float(atof(attr->value()));
-					}
-					else if (strcmp(attr->name(), "x2") == 0) {
-						line.x2 = float(atof(attr->value()));
-					}
-					else if (strcmp(attr->name(), "y1") == 0) {
-						line.y1 = float(atof(attr->value()));
-					}
-					else if (strcmp(attr->name(), "y2") == 0) {
-						line.y2 = float(atof(attr->value()));
-					}
-					else if (strcmp(attr->name(), "style") == 0) {
-						// Process this style string.
-						line.parse_style(attr->value());
-					}
-				}
-			}
-		}
-	}
-	end_time = ::omp_get_wtime();
-	std::cerr << "Walked XML in " << end_time - start_time << " seconds.\n";
-
-	std::cerr << "Found " << lines.size() << " lines.\n";
 
 	// From the beginning, look at the entire SVG.
 	view_left   = 0;
-	view_right  = svg_width;
-	view_bottom = svg_height;
+	view_right  = svg_file.get_width();
+	view_bottom = svg_file.get_height();
 	view_top    = 0;
 
 	// Start OpenGL.
 	glutInit(&argc,argv);
-	glutInitDisplayMode (GLUT_SINGLE | GLUT_RGBA );
+	glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGBA );
 	glutInitWindowSize(500,500);
 	glutCreateWindow("RapidSVG");
 	glutDisplayFunc(display);
@@ -338,6 +242,8 @@ int main(int argc, char** argv)
 	}
 	catch (std::exception& e) {
 		std::cerr << "ERROR: " << e.what() << std::endl;
+		std::cerr << "Press enter.";
+		std::cin.get();
 		return 1;
 	}
 }
