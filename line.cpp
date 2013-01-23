@@ -10,21 +10,19 @@ namespace rapidsvg {
 void Line::parse_style_entry(char* style)
 {
 	using namespace std;
-	//std::cerr << "=" << style << '\n';
 
 	char* name = style;
 	char* value = style;
-	while (style) {
+	while (*(++style)) {
 		if (*style == ':') {
 			*style = '\0';
 			value = style + 1;
 			break;
 		}
-		style++;
 	}
 
 	if (strcmp(name, "stroke-width") == 0) {
-		this->width = float(atof(value));
+		this->width = float(std::atof(value));
 	}
 	else if (strcmp(name, "stroke") == 0) {
 		parse_color(value, &this->r, &this->g, &this->b);

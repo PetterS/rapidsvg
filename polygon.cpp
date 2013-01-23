@@ -11,17 +11,15 @@ namespace rapidsvg {
 void Polygon::parse_style_entry(char* style)
 {
 	using namespace std;
-	//std::cerr << "=" << style << '\n';
 
 	char* name = style;
 	char* value = style;
-	while (style) {
+	while (*(++style)) {
 		if (*style == ':') {
 			*style = '\0';
 			value = style + 1;
 			break;
 		}
-		style++;
 	}
 
 	if (strcmp(name, "fill") == 0) {
@@ -61,11 +59,11 @@ void Polygon::parse_points(char* points)
 			}
 
 			if (pair_pos == 0) {
-				point.first = atof(start);
+				point.first = float(std::atof(start));
 				pair_pos = 1;
 			}
 			else {
-				point.second = atof(start);
+				point.second = float(std::atof(start));
 				this->points.push_back(point);
 				pair_pos = 0;
 			}
