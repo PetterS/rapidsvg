@@ -1,3 +1,5 @@
+// Petter Strandmark 2013.
+
 #ifndef RAPIDSVG_SVG_FILE_H
 #define RAPIDSVG_SVG_FILE_H
 

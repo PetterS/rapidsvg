@@ -1,3 +1,5 @@
+// Petter Strandmark 2013.
+
 #include <cstdlib>
 #include <cstring>
 #include <stdexcept>

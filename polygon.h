@@ -1,3 +1,5 @@
+// Petter Strandmark 2013.
+
 #ifndef RAPIDSVG_POLYGON_H
 #define RAPIDSVG_POLYGON_H
 
