@@ -1,4 +1,5 @@
 
+#include <cstring>
 #include <fstream>
 #include <iostream>
 #include <queue>

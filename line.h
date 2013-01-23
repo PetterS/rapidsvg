@@ -9,8 +9,8 @@ public:
 	         width(1), r(0), g(0), b(0)
 	{ }
 	float x1, y1, x2, y2;
-	float r, g, b;
 	float width;
+	float r, g, b;
 
 	// Parses a style string and modifies the line.
 	// Also modifies the string itself.
