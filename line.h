@@ -1,6 +1,8 @@
 #ifndef RAPIDSVG_LINE_H
 #define RAPIDSVG_LINE_H
 
+namespace rapidsvg {
+
 // Represents a line in the SVG file.
 class Line
 {
@@ -19,5 +21,7 @@ public:
 private:
 	void parse_style_entry(char* style);
 };
+
+}
 
 #endif

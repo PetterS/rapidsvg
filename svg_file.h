@@ -5,6 +5,9 @@
 #include <vector>
 
 #include "line.h"
+#include "polygon.h"
+
+namespace rapidsvg {
 
 // Represents a line in the SVG file.
 class SVGFile
@@ -22,11 +25,15 @@ public:
 
 	// Lines in the SVG.
 	std::vector<Line> lines;
+	// Polygons in the SVG.
+	std::vector<Polygon> polygons;
 private:
 	std::string filename;
 	double width, height;
 };
 
+void parse_color(const char* color, float* r, float* g, float* b);
 
+}
 
 #endif

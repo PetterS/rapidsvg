@@ -22,6 +22,8 @@
 #include "svg_file.h"
 
 
+namespace rapidsvg {
+
 // SVG file currently opened.
 SVGFile svg_file;
 
@@ -174,6 +176,15 @@ void display(void)
 	glHint( GL_LINE_SMOOTH_HINT, GL_NICEST );
 	glHint( GL_POLYGON_SMOOTH_HINT, GL_NICEST );
 
+	for (auto& polygon : svg_file.polygons) {
+		glBegin(GL_POLYGON);
+		glColor3d(polygon.r, polygon.g, polygon.b);
+		for (auto& point : polygon.points) {
+			glVertex2d(point.first, point.second);
+		}
+		glEnd();
+	}
+
 	for (auto& line : svg_file.lines) {
 		glColor3d(line.r, line.g, line.b);
 		draw_line(line.x1, line.y1, line.x2, line.y2, line.width, line.width);
@@ -231,6 +242,8 @@ void main_function(int argc, char** argv)
 	glutMainLoop();
 }
 
+}
+
 int main(int argc, char** argv)
 {
 	if (argc == 1) {
@@ -238,7 +251,7 @@ int main(int argc, char** argv)
 		return 0;
 	}
 	try {
-		main_function(argc, argv);
+		rapidsvg::main_function(argc, argv);
 	}
 	catch (std::exception& e) {
 		std::cerr << "ERROR: " << e.what() << std::endl;

@@ -11,6 +11,8 @@
 
 #include "svg_file.h"
 
+namespace rapidsvg {
+
 // Reads a binary file into a vector of char.
 void read_file_data(const std::string& file_name, std::vector<char>* data)
 {
@@ -24,6 +26,60 @@ void read_file_data(const std::string& file_name, std::vector<char>* data)
 	data->resize(file_size + 1);
 	if (!fin.read(&data->at(0), file_size)) {
 		throw std::runtime_error("Failed to read file.");
+	}
+}
+
+int hex_to_dec(char d1)
+{
+	if ('0' <= d1 && d1 <= '9') {
+		return d1 - '0';
+	}
+	switch (d1) {
+	case 'a': case 'A': return 10;
+	case 'b': case 'B': return 11;
+	case 'c': case 'C': return 12;
+	case 'd': case 'D': return 13;
+	case 'e': case 'E': return 14;
+	case 'f': case 'F': return 15;
+	}
+	std::string err = "Invalid hex digit :";
+	err += d1;
+	throw std::runtime_error(err);
+}
+
+void parse_color(const char* color, float* r, float* g, float* b)
+{
+	if (std::strcmp(color, "black") == 0) {
+		*r = 0; *g = 0; *b = 0;
+	}
+	else if (std::strcmp(color, "red") == 0) {
+		*r = 255; *g = 0; *b = 0;
+	}
+	else if (std::strcmp(color, "green") == 0) {
+		*r = 0; *g = 255; *b = 0;
+	}
+	else if (std::strcmp(color, "blue") == 0) {
+		*r = 0; *g = 0; *b = 255;
+	}
+	else if (std::strcmp(color, "yellow") == 0) {
+		*r = 255; *g = 255; *b = 0;
+	}
+	else if (strlen(color) == 7 && color[0] == '#') {
+		// Hexadecimal color.
+		*r = float(15 * hex_to_dec(color[1]) + hex_to_dec(color[2])) / 255.0f;
+		*g = float(15 * hex_to_dec(color[3]) + hex_to_dec(color[4])) / 255.0f;
+		*b = float(15 * hex_to_dec(color[5]) + hex_to_dec(color[6])) / 255.0f;
+	}
+	else if (strlen(color) == 5 && color[0] == '#' && color[1] == ' ') {
+		// ?
+		*r = 0;
+		*g = 0;
+		*b = 0;
+	}
+	else {
+		std::string err = "Invalid color : ";
+		err += color;
+		throw std::runtime_error(err);
 	}
 }
 
@@ -135,6 +191,24 @@ void SVGFile::load(const std::string& input_filename)
 					}
 				}
 			}
+			else if (strcmp(child->name(), "polygon") == 0) {
+				// Add line to the collection of lines.
+				polygons.push_back(Polygon());
+				Polygon& polygon = polygons.back();
+
+				// To through the line attributes.
+				for (xml_attribute<> *attr = child->first_attribute();
+						attr; attr = attr->next_attribute())
+				{
+					if (strcmp(attr->name(), "points") == 0) {
+						polygon.parse_points(attr->value());
+					}
+					else if (strcmp(attr->name(), "style") == 0) {
+						// Process this style string.
+						polygon.parse_style(attr->value());
+					}
+				}
+			}
 		}
 	}
 	end_time = ::omp_get_wtime();
@@ -142,5 +216,7 @@ void SVGFile::load(const std::string& input_filename)
 	
 	std::cerr << "SVG is " << this->width << " x " << this->height << "\n";
 	std::cerr << "Found " << lines.size() << " lines.\n";
+	std::cerr << "Found " << polygons.size() << " polygons.\n";
 }
 
+}
