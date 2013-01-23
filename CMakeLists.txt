@@ -140,6 +140,7 @@ ENDIF (CMAKE_BUILD_TYPE STREQUAL "Release")
 ADD_EXECUTABLE(rapidsvg
   rapidsvg.cpp
   line.cpp
+  polygon.cpp
   svg_file.cpp)
 
 IF (NOT MSVC)
