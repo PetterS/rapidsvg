@@ -93,6 +93,7 @@ SVGFile::SVGFile() :
 void SVGFile::clear()
 {
 	this->lines.clear();
+	this->polygons.clear();
 }
 
 void SVGFile::reload()
