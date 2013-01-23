@@ -131,7 +131,7 @@ void mouse(int button, int action, int x, int y)
 void keyboard (unsigned char key, int x, int y)
 {
 	//std::cerr << "key=" << int(key) << " x=" << x << " y=" << y << '\n';
-	
+
 	if (key == 'r') {
 		svg_file.reload();
 		glutPostRedisplay();
@@ -142,20 +142,20 @@ void keyboard (unsigned char key, int x, int y)
 // end thickness t2.
 void draw_line(float x1, float y1, float x2, float y2, float t1, float t2)
 {
-    float angle = std::atan2(y2 - y1, x2 - x1);
-    float t2sina1 = t1 / 2 * std::sin(angle);
-    float t2cosa1 = t1 / 2 * std::cos(angle);
-    float t2sina2 = t2 / 2 * std::sin(angle);
-    float t2cosa2 = t2 / 2 * std::cos(angle);
+	float angle = std::atan2(y2 - y1, x2 - x1);
+	float t2sina1 = t1 / 2 * std::sin(angle);
+	float t2cosa1 = t1 / 2 * std::cos(angle);
+	float t2sina2 = t2 / 2 * std::sin(angle);
+	float t2cosa2 = t2 / 2 * std::cos(angle);
 
-    glBegin(GL_TRIANGLES);
-    glVertex2f(x1 + t2sina1, y1 - t2cosa1);
-    glVertex2f(x2 + t2sina2, y2 - t2cosa2);
-    glVertex2f(x2 - t2sina2, y2 + t2cosa2);
-    glVertex2f(x2 - t2sina2, y2 + t2cosa2);
-    glVertex2f(x1 - t2sina1, y1 + t2cosa1);
-    glVertex2f(x1 + t2sina1, y1 - t2cosa1);
-    glEnd();
+	glBegin(GL_TRIANGLES);
+	glVertex2f(x1 + t2sina1, y1 - t2cosa1);
+	glVertex2f(x2 + t2sina2, y2 - t2cosa2);
+	glVertex2f(x2 - t2sina2, y2 + t2cosa2);
+	glVertex2f(x2 - t2sina2, y2 + t2cosa2);
+	glVertex2f(x1 - t2sina1, y1 + t2cosa1);
+	glVertex2f(x1 + t2sina1, y1 - t2cosa1);
+	glEnd();
 }
 
 void display(void)
@@ -197,17 +197,9 @@ void display(void)
 		std::cerr << "Rendered in " << end_time - start_time << " seconds.\n";
 		first_time = false;
 	}
-	
+
 	glFlush();
 	glutSwapBuffers();
-}
-void split(const std::string &s, char delim, std::vector<std::string>* elems) {
-	elems->clear();
-    std::stringstream ss(s);
-    std::string item;
-    while(std::getline(ss, item, delim)) {
-        elems->push_back(item);
-    }
 }
 
 void main_function(int argc, char** argv)
