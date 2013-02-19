@@ -1,0 +1,9 @@
+before_install:
+ - sudo apt-get update -qq
+ - sudo apt-get install -qq freeglut3-dev binutils-gold libxmu-dev libxi-dev
+language: cpp
+compiler:
+  - gcc
+  - clang
+script: mkdir build && cd build && cmake .. && make
+
