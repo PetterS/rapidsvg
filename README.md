@@ -1,5 +1,7 @@
 I have sometimes had to open very large SVG files, which is slow in Inkscape and any other program I have tried. RapidSVG is much faster than Inkscape to open and render a file, but can only handle lines and polygons of various sizes and colors.
 
+[![Build Status](https://travis-ci.org/PetterS/rapidsvg.png)](https://travis-ci.org/PetterS/rapidsvg)
+
 Usage
 -----
 * Use the mouse to drag the view and the wheel to zoom.
