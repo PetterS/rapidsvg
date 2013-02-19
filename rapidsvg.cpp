@@ -10,7 +10,19 @@
 #include <string>
 #include <vector>
 
-#include <omp.h>
+#ifdef USE_OPENMP
+	#include <omp.h>
+#else
+	#include <ctime>
+	namespace 
+	{
+		double omp_get_wtime()
+		{
+			return std::time(0);
+		}
+	}
+#endif
+
 
 #ifdef __APPLE__
 #include <GLUT/glut.h>
